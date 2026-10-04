@@ -1,1 +1,28 @@
 
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# अस्थायी रूप से डेटा स्टोर करने के लिए डिक्शनरी या लिस्ट
+messages = []
+
+@app.route('/send', methods=['POST'])
+def send_message():
+    data = request.json
+    sender = data.get('sender')
+    message = data.get('message')
+    
+    if not sender or not message:
+        return jsonify({'error': 'Sender and message are required!'}), 400
+        
+    packet = {'sender': sender, 'message': message}
+    messages.append(packet)
+    
+    return jsonify({'status': 'Success', 'data': packet}), 200
+
+@app.route('/receive', methods=['GET'])
+def get_messages():
+    return jsonify({'messages': messages}), 200
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
